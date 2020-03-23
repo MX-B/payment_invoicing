@@ -1,0 +1,16 @@
+
+${Ansi.BOLD} gr1d.io Portal
+${Ansi.NORMAL}
+ ${Ansi.BG_BRIGHT_GREEN} $$$$$$$\  $$\ $$\ $$\ $$\                      ${Ansi.BG_DEFAULT}
+ ${Ansi.BG_BRIGHT_GREEN} $$  __$$\ \__|$$ |$$ |\__|                     ${Ansi.BG_DEFAULT}
+ ${Ansi.BG_BRIGHT_GREEN} $$ |  $$ |$$\ $$ |$$ |$$\ $$$$$$$\   $$$$$$\   ${Ansi.BG_DEFAULT}
+ ${Ansi.BG_BRIGHT_GREEN} $$$$$$$\ |$$ |$$ |$$ |$$ |$$  __$$\ $$  __$$\  ${Ansi.BG_DEFAULT}
+ ${Ansi.BG_BRIGHT_GREEN} $$  __$$\ $$ |$$ |$$ |$$ |$$ |  $$ |$$ /  $$ | ${Ansi.BG_DEFAULT}
+ ${Ansi.BG_BRIGHT_GREEN} $$ |  $$ |$$ |$$ |$$ |$$ |$$ |  $$ |$$ |  $$ | ${Ansi.BG_DEFAULT}
+ ${Ansi.BG_BRIGHT_GREEN} $$$$$$$  |$$ |$$ |$$ |$$ |$$ |  $$ |\$$$$$$$ | ${Ansi.BG_DEFAULT}
+ ${Ansi.BG_BRIGHT_GREEN} \_______/ \__|\__|\__|\__|\__|  \__| \____$$ | ${Ansi.BG_DEFAULT}
+ ${Ansi.BG_BRIGHT_GREEN}                                     $$\   $$ | ${Ansi.BG_DEFAULT}
+ ${Ansi.BG_BRIGHT_GREEN}                                     \$$$$$$  | ${Ansi.BG_DEFAULT}
+ ${Ansi.BG_BRIGHT_GREEN}                                      \______/  ${Ansi.BG_DEFAULT}
+
+${Ansi.DEFAULT}${Ansi.ITALIC} Running on Spring Boot ${spring-boot.version}

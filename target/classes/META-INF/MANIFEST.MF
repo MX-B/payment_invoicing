@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Built-By: rafael
+Build-Jdk: 10.0.2
+Implementation-Title: gr1d-billing-service-java
+Implementation-Version: 0.1
+Implementation-Vendor-Id: io.gr1d
+Implementation-Vendor: GR1D
+Implementation-URL: https://projects.spring.io/spring-boot/#/spring-bo
+ ot-starter-parent/gr1d-billing-service-java
+Can-Redefine-Classes: true
+Can-Retransform-Classes: true
+Created-By: Maven Integration for Eclipse
+Premain-Class: com.newrelic.bootstrap.BootstrapAgent
+

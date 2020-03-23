@@ -1,0 +1,527 @@
+openapi: 3.0.0
+info:
+  title: "moneyex Portal Billing API"
+  description: An API for billing the usage of APIs within the moneyex Portal.
+  version: "1.0"
+  termsOfService: "https://moneyex.io/terms-of-service"
+  contact:
+    name: "Rafael M. Lins"
+    email: "rafael@moneyex.io"
+servers:
+  - url: https://{environment}/billing/{version}
+    description: "moneyex Portal Billing API"
+    variables:
+      environment:
+        default: api.moneyex.io
+        enum:
+          - api.moneyex.io
+          - portal.moneyex-api.com
+      version:
+        default: v1
+        enum:
+          - v1
+tags:
+  - name: "Enrollment"
+    description: "Registers a Credit Card to a user"
+  - name: "Card"
+    description: "Stored card information to be billed later"
+  - name: "Bill"
+    description: >-
+      Bills are generated monthly to charge for API uses.
+      A bill have one charge per API and all of them are grouped
+      to form the Bill value.
+
+# -----------------------------------------------------
+# - Endpoints -----------------------------------------
+# -----------------------------------------------------
+paths:
+# -----------------------------------------------------
+# - Enrollment ----------------------------------------
+# -----------------------------------------------------
+  /card/{userId}:
+    get:
+      tags:
+      - "Card"
+      summary: "Retrieves stored card information for the given user"
+      description: >-
+        Used to retrieve all stored card information. No sensitive data will be
+        returned.
+      operationId: "getCardInfo"
+      parameters:
+        - name: "userId"
+          in: "path"
+          required: true
+          type: "string"
+          description: "Identification of the requested User"
+      responses:
+        200:
+          description: "Returns the card information"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/CardInfo"
+            "application/xml":
+              schema:
+                $ref: "#/components/schemas/CardInfo"
+        404:
+          description: "When no card is found for the given userId"
+  /bill/user/{userId}:
+    get:
+      tags:
+      - "Bill"
+      summary: "Retrieves a paginated bill for the given user"
+      description: >-
+        Used to retrieve all bills for an user sorted by months descendant
+      operationId: "getBills"
+      parameters:
+        - name: "userId"
+          in: "path"
+          required: true
+          type: "string"
+          description: "Identification of the requested User"
+        - name: "limit"
+          in: "query"
+          required: false
+          type: "number"
+          description: "The limit per page to be retrieved, default 20, cannot be higher than 100"
+        - name: "offset"
+          in: "query"
+          required: false
+          type: "number"
+          description: "The start index to paginate, default 0"
+      responses:
+        200:
+          description: "Returns the bill page"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/BillPage"
+            "application/xml":
+              schema:
+                $ref: "#/components/schemas/BillPage"
+        404:
+          description: "Returned when the user doesn't exist"
+  /bill/user/{userId}/last:
+    get:
+      tags:
+        - "Bill"
+      summary: "Retrieves a detailed information of the last bill available"
+      description: "Retrieves a detailed information of the last bill available"
+      operationId: "getLastBill"
+      parameters:
+        - name: "userId"
+          in: "query"
+          required: true
+          type: "string"
+          description: "Identification of the requested User"
+      responses:
+        200:
+          description: "Returns the detailed information"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/BillDetailed"
+            "application/xml":
+              schema:
+                $ref: "#/components/schemas/BillDetailed"
+        404:
+          description: "Returned when the user doesn't exist"
+  /bill/uuid/{uuid}:
+      get:
+        tags:
+          - "Bill"
+        summary: "Retrieves a detailed information of the bill with given UUID"
+        description: "Retrieves a detailed information of the bill with given UUID"
+        operationId: "getBillByUuid"
+        parameters:
+          - name: "uuid"
+            in: "query"
+            required: true
+            type: "string"
+            description: "Identification of the Bill"
+        responses:
+          200:
+            description: "Returns the detailed information"
+            content:
+              "application/json":
+                schema:
+                  $ref: "#/components/schemas/BillDetailed"
+              "application/xml":
+                schema:
+                  $ref: "#/components/schemas/BillDetailed"
+          404:
+            description: "When there's no Bill for the given UUID"
+  /bill/generate:
+    post:
+      tags:
+        - "Bill"
+      summary: "Generate a bill for the user and year/month and return the generated bill"
+      description: "If a bill already exists for the user year/month just return this bill"
+      operationId: "generateBill"
+      requestBody:
+        required: true
+        description: "User Id, Month and Year"
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/BillGenerationRequest"
+          "application/xml":
+            schema:
+              $ref: "#/components/schemas/BillGenerationRequest"
+      responses:
+        201:
+          description: "Returns the created bill"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/BillDetailed"
+            "application/xml":
+              schema:
+                $ref: "#/components/schemas/BillDetailed"
+        200:
+          description: "Returns the already existant bill"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/BillDetailed"
+            "application/xml":
+              schema:
+                $ref: "#/components/schemas/BillDetailed"
+  /bill/charge/{uuid}:
+    post:
+      tags:
+        - "Bill"
+      summary: "Charges a Bill"
+      description: "This endpoint is only necessary if a bill wasn't charged or had it's payment refused"
+      operationId: "chargeBill"
+      parameters:
+        - name: "uuid"
+          in: "query"
+          required: true
+          type: "string"
+          description: "Identification of the Bill"
+      responses:
+        200:
+          description: "The charge was successfuly made, but the payment isn't processed yet"
+        304:
+          description: "No charge was made because it has been made before or wasn't necessary"
+  /authorise-card:
+    post:
+      tags:
+        - "Enrollment"
+      summary: "Authorises a credit card for billing"
+      description: >-
+        After invoking this method, it is possible to bill an user of its usage
+        of the moneyex Portal APIs
+      operationId: "authoriseCard"
+      requestBody:
+        required: true
+        description: "Credit card data and an ID"
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/CardAuthorisationRequest"
+          "application/xml":
+            schema:
+              $ref: "#/components/schemas/CardAuthorisationRequest"
+      responses:
+        "200":
+          description: "Card successfully authorised"
+        "422":
+          description: "Invalid Input"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/ErrorList"
+            "application/xml":
+              schema:
+                $ref: "#/components/schemas/ErrorList"
+        default:
+          description: "Unexpected error"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/ErrorList"
+            "application/xml":
+              schema:
+                $ref: "#/components/schemas/ErrorList"
+
+
+
+# -----------------------------------------------------
+# - Components ----------------------------------------
+# -----------------------------------------------------
+components:
+# -----------------------------------------------------
+# - Security Scheme -----------------------------------
+# -----------------------------------------------------
+#  securitySchemes:
+#    JWT:
+#      type: "apiKey"
+#      name: "X-Auth-Token"
+#      in: "header"
+
+# -----------------------------------------------------
+# - Entities ------------------------------------------
+# -----------------------------------------------------
+  schemas:
+# -----------------------------------------------------
+# - Base Entities -------------------------------------
+# -----------------------------------------------------
+    ErrorList:
+      type: array
+      description: "All errors are returned as an array of Error entities"
+      items:
+        $ref: "#/components/schemas/Error"
+    Error:
+      type: object
+      description: "Describes an error"
+      required:
+        - error
+        - message
+        - timestamp
+      properties:
+        error:
+          type: string
+          description: "What kind of error is this"
+        message:
+          type: string
+          description: "A localized, user-friendly error message"
+        timestamp:
+          type: string
+          format: "date-time"
+          description: "When the error ocurred"
+        meta:
+          type: string
+          description: "Extra information about the error, such as an invalid field on a validation error"
+        trace:
+          type: string
+          description: "Used for debugging purposes"
+
+    BillSimple:
+      type: object
+      description: "This is a simple Bill return"
+      properties:
+        value:
+          type: number
+          format: integer
+          description: "The bill total value 10050 is equal to $ 100.50"
+        status:
+          type: object
+          $ref: "#/components/schemas/BillPaymentStatus"
+        reference_month:
+          type: string
+          description: "The YYYYMM bill month reference"
+        details:
+          type: array
+          items:
+            $ref: "#/components/schemas/BillDetail"
+
+    BillDetailed:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/BillSimple"
+        - type: object
+          properties:
+            status_history:
+              type: array
+              items:
+                $ref: "#/components/schemas/BillStatusHistory"
+
+    BillDetail:
+      type: object
+      description: "A bill entry, charged per used API"
+      properties:
+        value:
+          type: number
+          format: integer
+          description: "The API total value 10050 is equal to $ 100.50"
+        hits:
+          type: number
+          format: integer
+          description: "Hits quantity for the API"
+        api_id:
+          type: string
+          description: "The API id"
+        value_per_hit:
+          type: number
+          format: integer
+          description: "The value charged per hit 10000 is equal to $ 0.01"
+
+    BillStatusHistory:
+      type: object
+      description: >-
+          The Bill Status History. Any status changes create an entry on this list.
+          It can be used to show what and when happened with a Bill
+      properties:
+        status:
+          type: object
+          $ref: "#/components/schemas/BillPaymentStatus"
+        timestamp:
+          type: string
+          format: timestamp
+          example: "2018-06-21T18:32:31"
+
+    BillPaymentStatus:
+      type: string
+      description: "Bill payment status"
+      enum:
+        - "CREATED"
+        - "PROCESSING"
+        - "PROCESSING_RETRY"
+        - "REFUNDING"
+        - "REFUNDED"
+        - "FAILED"
+        - "SUCCESS"
+
+    BillPage:
+      type: object
+      description: "Page informations"
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/BillSimple"
+        limit:
+          type: number
+          format: integer
+        offset:
+          type: number
+          format: integer
+        total_elements:
+          type: number
+          format: integer
+
+    CardInfo:
+      type: object
+      description: "Card stored information no sensitive data is stored"
+      properties:
+        card_first_digits:
+          type: string
+          pattern: "\\d{6}"
+          description: >-
+            Card number's first 6 digits
+          example: "498423"
+        card_last_digits:
+          type: string
+          pattern: "\\d{4}"
+          description: >-
+            Card number's last 4 digits
+          example: "1167"
+        card_holder_name:
+          type: string
+          description: "Name printed on the card"
+          example: "ANDREW C D KOWL"
+        personal_info:
+          type: object
+          $ref: "#/components/schemas/PersonalInfo"
+          description: "Card holder personal info"
+
+    PersonalInfo:
+      type: object
+      description: "Informations about a person, usually a card holder"
+      properties:
+        full_name:
+          type: string
+          description: "Personal full name"
+        email:
+          type: string
+          format: email
+          description: "Personal email"
+        document:
+          type: string
+          description: "Document ID may be for a Person or a Company"
+        document_type:
+          type: integer
+          enum:
+            - 1
+            - 2
+          description: "1 for Person and 2 for Company"
+        phone:
+          type: string
+          pattern: "\\+\\d{3,23}"
+          description: "Personal phone"
+        date_of_birth:
+          type: string
+          format: date
+          description: "Date of birth"
+
+# -----------------------------------------------------
+# - Requests ------------------------------------------
+# -----------------------------------------------------
+    BillGenerationRequest:
+      type: object
+      description: "Data needed for generating a bill for a user"
+      required:
+        - user_id
+        - month
+        - year
+      properties:
+        user_id:
+          type: string
+          description: "ID of an moneyex Portal APIs User"
+        month:
+          type: number
+          description: "The month to generate this bill"
+        year:
+          type: number
+          description: "The year to generate this bill"
+    CardAuthorisationRequest:
+      type: object
+      description: "Data needed for authorising a credit card for billing"
+      required:
+        - user_id
+        - card_number
+        - card_expiration_date
+        - card_cvv
+        - card_holder_name
+        - full_name
+        - email
+        - document_type
+        - document
+        - phone
+        - date_of_birth
+      properties:
+        user_id:
+          type: string
+          description: "ID of an moneyex Portal APIs User"
+        card_number:
+          type: string
+          description: "Card number (only numbers)"
+          pattern: "\\d{16}"
+        card_expiration_date:
+          type: string
+          format: "MMYY"
+          description: "Card expiration date in the `MMYY` format"
+          pattern: "\\d{4}"
+        card_cvv:
+          type: string
+          description: "The Card Verification Value. More info: https://www.cvvnumber.com/"
+          pattern: "\\d{3}"
+        card_holder_name:
+          type: string
+          description: "Card holder name as printed on card"
+        full_name:
+          type: string
+          description: "Card holder full name"
+        email:
+          type: string
+          format: email
+          description: "Card holder personal email"
+        document:
+          type: string
+          description: "Document personal ID"
+        document_type:
+          type: integer
+          enum:
+            - 1
+            - 2
+          description: "The document's type. 1 for Person and 2 for Company"
+        phone:
+          type: string
+          pattern: "\\+\\d{3,23}"
+          description: "Card holder personal phone"
+        date_of_birth:
+          type: string
+          format: date
+          description: "Card holder date of birth"

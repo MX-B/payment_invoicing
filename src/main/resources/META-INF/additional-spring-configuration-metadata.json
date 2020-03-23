@@ -1,0 +1,87 @@
+{"properties": [
+  {
+    "name": "gr1d.portal.billing.gateway",
+    "type": "java.lang.String",
+    "description": "Which Payment Gateway will the gr1d Portal Billing use by default"
+  },
+  {
+    "name": "gr1d.portal.billing.pagarme.apiKey",
+    "type": "java.lang.String",
+    "description": "The Pagar.me API Key"
+  },
+  {
+    "name": "gr1d.portal.billing.pagarme.encKey",
+    "type": "java.lang.String",
+    "description": "The Pagar.me Encryption Public Key"
+  },
+  {
+    "name": "gr1d.portal.billing.endpoint",
+    "type": "java.lang.String",
+    "description": "The external URL where this service will be served"
+  },
+  {
+    "name": "gr1d.portal.billing.api.subscriptions.url",
+    "type": "java.lang.String",
+    "description": "The URL of the Subscriptions Service"
+  },
+  {
+    "name": "gr1d.portal.billing.api.subscriptions.authToken",
+    "type": "java.lang.String",
+    "description": "AuthToken to be sent to the Subscriptions Service"
+  },
+  {
+    "name": "gr1d.portal.billing.api.ca.url",
+    "type": "java.lang.String",
+    "description": "The URL of the CA API Portal where we will get the API Hits data"
+  },
+  {
+    "name": "gr1d.portal.billing.api.ca.clientId",
+    "type": "java.lang.String",
+    "description": "Our clientId at the CA API Portal"
+  },
+  {
+    "name": "gr1d.portal.billing.api.ca.clientSecret",
+    "type": "java.lang.String",
+    "description": "Our client secret at the CA API Portal"
+  },
+  {
+    "name": "gr1d.portal.billing.api.ca.accessTokenUrl",
+    "type": "java.lang.String",
+    "description": "The URL of the CA API Portal for generating access tokens"
+  },
+  {
+    "name": "gr1d.portal.billing.api.ca.scope",
+    "type": "java.lang.String",
+    "description": "The needed scopes at the CA API Portal"
+  },
+  {
+    "name": "feign.oauth2.enabled",
+    "type": "java.lang.Boolean",
+    "description": "Enable OAuth2 at Netflix Feign"
+  },
+  {
+    "name": "gr1d.portal.billing.paging.defaultLimit",
+    "type": "java.lang.String",
+    "description": "The default number of items on a listing page"
+  },
+  {
+    "name": "gr1d.portal.billing.paging.maxLimit",
+    "type": "java.lang.String",
+    "description": "The maximum number of items on a listing page"
+  },
+  {
+    "name": "gr1d.portal.billing.charging.automaticCharge.statuses",
+    "type": "java.lang.String",
+    "description": "Which statuses are available to be charged automatically? (CSV, Default: CREATED)"
+  },
+  {
+    "name": "gr1d.portal.billing.charging.automaticCharge.batchSize",
+    "type": "java.lang.Integer",
+    "description": "How many bills are we processing in each step? (Default: 100)"
+  },
+  {
+    "name": "gr1d.portal.billing.charging.split.ownerRecipientId",
+    "type": "java.lang.String",
+    "description": "Payment Gateway Recipient ID for gr1d (sort of a default recipient for values)"
+  }
+]}
